@@ -21,6 +21,12 @@ class Coordinate(NamedTuple):
     crs: CRS
 
     def __repr__(self):
+        """
+        __repr__ _summary_
+
+        :return: _description_
+        :rtype: _type_
+        """
         crs_a = self.crs.to_authority() if self.crs else "Null"
         return f"Coordinate(coordinate_id={self.coordinate_id}, x={self.x}, y={self.y}, crs={crs_a})"
 
@@ -38,19 +44,45 @@ class Coordinate(NamedTuple):
 
     @property
     def x(self) -> float:
+        """
+        x function returns geom of self as float.
+
+        :return: geometry of self
+        """
         return self.geom.x
 
     @property
     def y(self) -> float:
+        """
+        y returns geom of self
+
+        :return: _description_
+        :rtype: float
+        """
         return self.geom.y
 
     def to_crs(self, new_crs: CRS) -> Coordinate:
+        """
+        to_crs: returns a coordinate object of self given a new crs?
+
+        :param new_crs: _description_
+        :type new_crs: CRS
+        :raises ValueError: _description_
+        :return: _description_
+        :rtype: Coordinate
+        """
+        
+
+        
+
         transformer = Transformer.from_crs(self.crs, new_crs)
+        # defining new_x, and new_y using a transformer to retrieve the geometries of x and y.
         new_x, new_y = transformer.transform(self.geom.y, self.geom.x)
 
         if math.isinf(new_x) or math.isinf(new_y):
-            raise ValueError(f"Unable to convert {self.crs} ({self.geom.x}, {self.geom.y}) -> {new_crs} ({new_x}, {new_y})")
-
+            raise ValueError(
+                f"Unable to convert {self.crs} ({self.geom.x}, {self.geom.y}) -> {new_crs} ({new_x}, {new_y})"
+            )
         return Coordinate(
             coordinate_id=self.coordinate_id, geom=Point(new_x, new_y), crs=new_crs
         )

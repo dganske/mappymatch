@@ -24,26 +24,61 @@ class Trace:
         self._frame = frame
 
     def __getitem__(self, i):
+        """
+        __getitem__ returns a Trace Object given new_frame which is the self._frame value at the location index i.
+
+        :param i: _description_
+        :type i: _type_
+        :return: _description_
+        :rtype: _type_
+        """
         if isinstance(i, int):
             i = [i]
         new_frame = self._frame.iloc[i]
         return Trace(new_frame)
 
     def __add__(self, other: Trace) -> Trace:
+        """
+        __add__ _summary_
+
+        :param other: _description_
+        :type other: Trace
+        :raises TypeError: _description_
+        :return: _description_
+        :rtype: Trace
+        """
         if self.crs != other.crs:
             raise TypeError(f"cannot add two traces together with different crs")
         new_frame = pd.concat([self._frame, other._frame])
         return Trace(new_frame)
 
     def __len__(self):
+        """
+        __len__ _summary_
+
+        :return: _description_
+        :rtype: _type_
+        """
         return len(self._frame)
 
     @property
     def index(self) -> pd.Index:
+        """
+        index _summary_
+
+        :return: _description_
+        :rtype: pd.Index
+        """
         return self._frame.index
 
     @cached_property
     def coords(self) -> List[Coordinate]:
+        """
+        coords _summary_
+
+        :return: _description_
+        :rtype: List[Coordinate]
+        """
         coords_list = [
             Coordinate(i, g, self.crs)
             for i, g in zip(self._frame.index, self._frame.geometry)
@@ -52,7 +87,10 @@ class Trace:
 
     def geohashes(self, precision=12) -> Set[str]:
         """
-        returns a set of the geohashes that this trace intersects
+        geohashes returns a set of the geohashes that this trace intersects
+
+        :return: _description_
+        :rtype: _type_
         """
         if self.crs != LATLON_CRS:
             frame = self._frame.to_crs(LATLON_CRS)
@@ -67,12 +105,21 @@ class Trace:
 
     @property
     def crs(self) -> CRS:
+        """
+        crs _summary_
+
+        :return: _description_
+        :rtype: CRS
+        """
         return self._frame.crs
 
     @classmethod
     def build(cls, frame: GeoDataFrame, xy: bool = True) -> Trace:
         """
-        build a new trace
+        build -> builds a new trace.
+
+        :return: _description_
+        :rtype: _type_
         """
         if xy:
             frame = frame.to_crs(XY_CRS)
